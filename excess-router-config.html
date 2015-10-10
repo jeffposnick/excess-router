@@ -68,6 +68,14 @@ Notes:
       },
 
       /**
+       * name for the search parameter when using the `search` `pathStyle`
+       */
+      searchParamName: {
+        type: String,
+        value: 'page'
+      },
+
+      /**
        * prefix for alias style paths
        */
       aliasPathPrefix: {
@@ -75,7 +83,7 @@ Notes:
         value: '@'
       },
       /**
-       * 'hash' for '#' routing, 'path' for paths
+       * 'hash' for '#' routing, 'path' for paths, 'search' for search
        */
       pathStyle: {
         type: String,

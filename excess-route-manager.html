@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html">
+<script src="../url-search-params/build/url-search-params.js"></script>
 <script src="pathToRegexp.js"></script>
 <script>
 (function() {
@@ -95,6 +96,9 @@
 
     // prefix for hash paths
     hashPrefix: '#',
+
+    // name for the search parameter when using the `search` `pathStyle`
+    searchParamName: 'page',
 
     // Routes starting with aliasPathPrefix will be interpreted as aliases
     aliasPathPrefix: '@',
@@ -309,7 +313,7 @@ routes are not ready by then, set to false, and call RouteManager.start() when r
 - `basePath: ''`. base path for path style routing. Set to your app's root path.
 - `hashPrefix: '#'`. Prefix for hash paths. You might also like '#!'
 - `aliasPathPrefix: '@'`. Routes starting with aliasPathPrefix will be interpreted as aliases
-- `pathStyle: 'hash'`. Are your paths hashes, or real paths? 'hash'|'path'
+- `pathStyle: 'hash'`. Are your paths hashes, a search param, or real paths? 'hash'|'search'|'path'
 - `tokenPrefix: 'toke-'`. Routes starting with token prefix are tokens. You can ignore this
 setting unless you get conflicts
 
@@ -334,7 +338,7 @@ setting unless you get conflicts
      * @param {object} options --
      * @param {boolean} options.anchorRouting -- true if anchor clicks should be intercepted
      * @param {string} options.autoStart -- automatically start on WebComponentsReady
-     * @param {string} options.pathStyle -- hash/path
+     * @param {string} options.pathStyle -- hash/path/search
      * @param {string} options.basePath -- base path for path routing
      * @param {string} options.hashPrefix -- hash prefix: default '#', set '#!' if you need it
      * @param {string} options.aliasPathPrefix -- paths with this prefix are considered alias. default '@'
@@ -409,11 +413,17 @@ setting unless you get conflicts
     },
 
     _urlFromRoutePath: function(routePath) {
-      if (RouterState.pathStyle === 'hash') {
-        return RouterState.hashPrefix + routePath;
-      }
-      else {
-        return RouterState.basePath + routePath;
+      switch (RouterState.pathStyle) {
+        case 'hash':
+          return RouterState.hashPrefix + routePath;
+
+        case 'path':
+          return RouterState.basePath + routePath;
+
+        case 'search':
+          var searchParams = new URLSearchParams(window.location.search.substring(1));
+          searchParams.set(RouterState.searchParamName, routePath);
+          return '?' + searchParams.toString();
       }
     },
 
@@ -683,6 +693,10 @@ setting unless you get conflicts
         else { // no basePath
           path = window.location.pathname;
         }
+      }
+      else if (RouterState.pathStyle === 'search') {
+        var searchParams = new URLSearchParams(window.location.search.substring(1));
+        path = searchParams.get(RouterState.searchParamName) || '/';
       }
       else { // _pathStyle === 'hash'
         // Parse hash-style path
