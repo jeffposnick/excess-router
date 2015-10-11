@@ -639,10 +639,7 @@ setting unless you get conflicts
           this._anchorRoutingListener = document.addEventListener('click', function(ev) {
             if (ev.target.nodeName === 'A') {
               try {
-                var href = ev.target.getAttribute('href');
-                if (StringStartsWith(href,RouterState.hashPrefix)) {
-                  href = href.replace(RouterState.hashPrefix, '');
-                }
+                var href = ev.target.pathname;
                 if (href) {
                   this.transitionTo(href);
                   ev.preventDefault();
@@ -683,7 +680,7 @@ setting unless you get conflicts
           path = '/';
         }
         else if (RouterState.basePath) {
-          var match = window.location.pathname.match(RouterState.basePath + "(.*}");
+          var match = window.location.pathname.match(RouterState.basePath + "(.*)");
           if (!match) {
             console.error("Base path does not match window.location");
           }
